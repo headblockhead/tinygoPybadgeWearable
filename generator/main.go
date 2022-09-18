@@ -13,7 +13,6 @@ import (
 func main() {
 	GenerateLogoRGBAFile("generator/images/1.png", 1)
 	GenerateLogoRGBAFile("generator/images/2.png", 2)
-	GenerateLogoRGBAFile("generator/images/3.png", 3)
 }
 
 func GenerateLogoRGBAFile(filepath string, index int) {

@@ -1,5 +1,0 @@
-package main
-
-import "image/color"
-
-var logoRGBA3 = []color.RGBA{ {{.LogoRGBA}} }
