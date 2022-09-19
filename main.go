@@ -37,8 +37,8 @@ func main() {
 
 	display.EnableBacklight(true)
 	display.FillScreen(color.RGBA{R: 0, G: 0, B: 0})
-	CurrentMode := 0
-	OldMode := -1
+	currentMode := 0
+	oldMode := -1
 	funMode := false
 	released := true
 
@@ -49,13 +49,14 @@ func main() {
 	objectVelocityX := int16(2)
 	objectVelocityY := int16(4)
 
+	rgbCycleIndex := uint8(0)
 	for {
 		pressed, _ := buttons.ReadInput()
 
 		if released && buttons.Pins[shifter.BUTTON_START].Get() {
 			funMode = !funMode
 			if !funMode {
-				OldMode = -1
+				oldMode = -1
 				playTone(1500, 15, &bzrPin)
 			} else {
 				playTone(1300, 15, &bzrPin)
@@ -64,10 +65,10 @@ func main() {
 			time.Sleep(100 * time.Millisecond)
 		}
 		if released && buttons.Pins[shifter.BUTTON_SELECT].Get() {
-			if CurrentMode < 2 {
-				CurrentMode += 1
+			if currentMode < 2 {
+				currentMode += 1
 			} else {
-				CurrentMode = 0
+				currentMode = 0
 			}
 			playTone(2000, 15, &bzrPin)
 			// Debounce
@@ -79,20 +80,21 @@ func main() {
 		} else {
 			released = false
 		}
+
 		//|| funMode
-		if OldMode != CurrentMode {
+		if oldMode != currentMode {
 			display.FillRectangleWithBuffer(0, 0, 160, 36, logoRGBAheader)
-			if CurrentMode == 0 {
+			if currentMode == 0 {
 				display.FillRectangleWithBuffer(0, 36, 160, 71, logoRGBA2)
-			} else if CurrentMode == 1 {
+			} else if currentMode == 1 {
 				display.FillRectangleWithBuffer(0, 36, 160, 71, logoRGBA3)
-			} else if CurrentMode == 2 {
+			} else if currentMode == 2 {
 				display.FillRectangleWithBuffer(0, 36, 160, 71, logoRGBA4)
 			} else {
 				display.FillScreen(color.RGBA{R: 0, G: 0, B: 0})
 			}
 			display.FillRectangleWithBuffer(0, 107, 160, 21, logoRGBAfooter)
-			OldMode = CurrentMode
+			oldMode = currentMode
 		}
 		if funMode {
 			objectX += objectVelocityX
@@ -151,10 +153,8 @@ func main() {
 			display.DrawFastHLine(objectX+23, objectX+26, objectY+17, color.RGBA{R: 255, G: 76, B: 38})
 			display.DrawFastHLine(objectX+9, objectX+23, objectY+23, color.RGBA{R: 255, G: 76, B: 38})
 			display.DrawFastHLine(objectX+9, objectX+26, objectY+27, color.RGBA{R: 255, G: 76, B: 38})
-
 			time.Sleep(30 * time.Millisecond)
 		}
-
 	}
 }
 
@@ -166,4 +166,15 @@ func playTone(tone int, length int, bzrPin *machine.Pin) {
 		bzrPin.Low()
 		time.Sleep(time.Duration(tone) * time.Microsecond)
 	}
+}
+
+func getRainbowRGB(i uint8) color.RGBA {
+	if i < 85 {
+		return color.RGBA{i * 3, 255 - i*3, 0, 255}
+	} else if i < 170 {
+		i -= 85
+		return color.RGBA{255 - i*3, 0, i * 3, 255}
+	}
+	i -= 170
+	return color.RGBA{0, i * 3, 255 - i*3, 255}
 }
