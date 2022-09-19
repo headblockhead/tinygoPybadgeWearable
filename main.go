@@ -49,7 +49,6 @@ func main() {
 	objectVelocityX := int16(2)
 	objectVelocityY := int16(4)
 
-	rgbCycleIndex := uint8(0)
 	for {
 		pressed, _ := buttons.ReadInput()
 
