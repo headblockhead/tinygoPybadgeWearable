@@ -28,12 +28,21 @@ func main() {
 	buttons = shifter.NewButtons()
 	buttons.Configure()
 
+	bzrPin := machine.A0
+	bzrPin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+
+	speaker := machine.SPEAKER_ENABLE
+	speaker.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	speaker.High()
+
 	display.EnableBacklight(true)
 	display.FillScreen(color.RGBA{R: 0, G: 0, B: 0})
 	CurrentMode := 0
 	OldMode := -1
 	funMode := false
 	released := true
+
+	funmodePitchAlternate := false
 
 	objectX := int16(10)
 	objectY := int16(10)
@@ -47,6 +56,9 @@ func main() {
 			funMode = !funMode
 			if !funMode {
 				OldMode = -1
+				playTone(1500, 15, &bzrPin)
+			} else {
+				playTone(1300, 15, &bzrPin)
 			}
 			// Debounce
 			time.Sleep(100 * time.Millisecond)
@@ -57,6 +69,7 @@ func main() {
 			} else {
 				CurrentMode = 0
 			}
+			playTone(2000, 15, &bzrPin)
 			// Debounce
 			time.Sleep(100 * time.Millisecond)
 		}
@@ -90,7 +103,14 @@ func main() {
 				} else if objectX+28 > 160 {
 					objectX = 160 - 29
 				}
+				// Bounce
 				objectVelocityX = -objectVelocityX
+				if funmodePitchAlternate {
+					playTone(900, 30, &bzrPin)
+				} else {
+					playTone(700, 30, &bzrPin)
+				}
+				funmodePitchAlternate = !funmodePitchAlternate
 			}
 			if objectY < 0 || objectY+28 > 128 {
 				if objectY < 0 {
@@ -98,7 +118,14 @@ func main() {
 				} else if objectY+28 > 128 {
 					objectY = 128 - 29
 				}
+				// Bounce
 				objectVelocityY = -objectVelocityY
+				if funmodePitchAlternate {
+					playTone(300, 30, &bzrPin)
+				} else {
+					playTone(500, 30, &bzrPin)
+				}
+				funmodePitchAlternate = !funmodePitchAlternate
 			}
 			for x := int16(0); x < 28; x++ {
 				display.DrawFastVLine(objectX+x, objectY, objectY+28, color.RGBA{R: 255, G: 255, B: 255})
@@ -128,5 +155,15 @@ func main() {
 			time.Sleep(30 * time.Millisecond)
 		}
 
+	}
+}
+
+func playTone(tone int, length int, bzrPin *machine.Pin) {
+	for i := 0; i < length; i++ {
+		bzrPin.High()
+		time.Sleep(time.Duration(tone) * time.Microsecond)
+
+		bzrPin.Low()
+		time.Sleep(time.Duration(tone) * time.Microsecond)
 	}
 }
