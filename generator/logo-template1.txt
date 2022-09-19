@@ -2,4 +2,4 @@ package main
 
 import "image/color"
 
-var logoRGBA1 = []color.RGBA{ {{.LogoRGBA}} }
+var logoRGBAfooter = []color.RGBA{ {{.LogoRGBA}} }

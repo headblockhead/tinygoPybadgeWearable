@@ -48,13 +48,17 @@ func main() {
 			if !funMode {
 				OldMode = -1
 			}
+			// Debounce
+			time.Sleep(100 * time.Millisecond)
 		}
 		if released && buttons.Pins[shifter.BUTTON_SELECT].Get() {
-			if CurrentMode < 1 {
+			if CurrentMode < 2 {
 				CurrentMode += 1
 			} else {
 				CurrentMode = 0
 			}
+			// Debounce
+			time.Sleep(100 * time.Millisecond)
 		}
 
 		if pressed == 0 {
@@ -64,13 +68,17 @@ func main() {
 		}
 		//|| funMode
 		if OldMode != CurrentMode {
+			display.FillRectangleWithBuffer(0, 0, 160, 36, logoRGBAheader)
 			if CurrentMode == 0 {
-				display.FillRectangleWithBuffer(0, 0, 160, 128, logoRGBA1)
+				display.FillRectangleWithBuffer(0, 36, 160, 71, logoRGBA2)
 			} else if CurrentMode == 1 {
-				display.FillRectangleWithBuffer(0, 0, 160, 128, logoRGBA2)
+				display.FillRectangleWithBuffer(0, 36, 160, 71, logoRGBA3)
+			} else if CurrentMode == 2 {
+				display.FillRectangleWithBuffer(0, 36, 160, 71, logoRGBA4)
 			} else {
 				display.FillScreen(color.RGBA{R: 0, G: 0, B: 0})
 			}
+			display.FillRectangleWithBuffer(0, 107, 160, 21, logoRGBAfooter)
 			OldMode = CurrentMode
 		}
 		if funMode {
@@ -119,5 +127,6 @@ func main() {
 
 			time.Sleep(30 * time.Millisecond)
 		}
+
 	}
 }
